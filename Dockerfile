@@ -22,4 +22,4 @@ RUN npm run build
 #    && rm -rf /var/lib/apt/lists/*
 
 # Start me!
-CMD ["npm", "run", "start"]
+#CMD ["npm", "run", "start"]
