@@ -11,6 +11,7 @@ ENV CI=false
 RUN npm install
 COPY . /usr/src/site
 RUN npm run build
+COPY . .
 
 
 
