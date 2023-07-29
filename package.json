@@ -30,6 +30,9 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"socket.io-client": "^4.7.1"
+		"@fortawesome/free-solid-svg-icons": "^6.4.0",
+		"jsonwebtoken": "^9.0.1",
+		"socket.io-client": "^4.7.1",
+		"svelte-fa": "^3.0.4"
 	}
 }

@@ -1,17 +1,20 @@
 <script>
-	import { goto } from '$app/navigation';
-
-	import { Avatar } from '@skeletonlabs/skeleton';
+	import { goto, invalidateAll } from '$app/navigation';
 	import { onMount } from 'svelte';
-	import { fade } from 'svelte/transition';
 	import socket from '$lib/ws.js';
+	import Fa from 'svelte-fa';
+	import { faLeftLong } from '@fortawesome/free-solid-svg-icons';
+	import { Avatar } from '@skeletonlabs/skeleton';
 	export let data;
-	let domains = [];
-	let domain;
+	console.log(data);
+	let saving = false;
+	let content = '';
+	let items = [];
 	let popup = {
 		enabled: false
 	};
-	let items = [];
+	socket.emit('getFile', data.file);
+
 	onMount(() => {
 		//on click outside popup
 		document.addEventListener('click', (e) => {
@@ -19,55 +22,70 @@
 				popup.enabled = false;
 			}
 		});
-
 		//socket stuff
-		socket.emit('authenticate', data.jwt);
-		socket.on('authenticated', () => {
-			console.log('authenticated');
-			socket.emit('getFiles');
+		socket.on('connect', () => {
+			goto('/'); //redirect to login page
 		});
-		socket.on('files', (data) => {
-			items = data;
-			console.log(data);
-		});
-		socket.on('domains', (data) => {
-			domains = data;
+		socket.on('file', (data) => {
+			content = data;
 		});
 		socket.on('refresh', () => {
-			window.location.reload();
+			goto('/'); //redirect to login page
 		});
-		socket.on('selectDomain', (data) => {
-			if (data === false) {
-				//remove domain from domains
-				domains = domains.filter((item) => item.domain != domain);
-				domain = undefined;
+		socket.on('saveFile', (data) => {
+			if (data) saving = false;
+			else {
+				alert('Error saving file');
+				saving = false;
 			}
 		});
+		socket.on('files', (files) => {
+			let toadd = [];
+			files.forEach((item) => {
+				if (`${item.path}` === `/${data.file}`) toadd = [...toadd, item];
+			});
+			items = toadd;
+		});
 	});
+
+	console.log(content);
 </script>
 
 <div class="container h-full mx-auto flex flex-col">
-	<h1 class="text-4xl font-bold">
-		{#if domain} {domain} {:else} File Explorer {/if}
-	</h1>
+	<div>
+		<a href="../" class="btn variant-filled">
+			<Fa icon={faLeftLong} />
+		</a>
+		<h1 class="text-4xl font-bold">
+			{data.file}
+		</h1>
+	</div>
 	<br />
-	<dl class="list-dl">
-		{#if domains.length > 0 && items.length < 1}
-			{#each domains as domainItem}
-				<button
-					class="btn variant-filled"
-					on:click={() => {
-						socket.emit('selectDomain', domainItem.domain);
-						domain = domainItem.domain;
-					}}
-				>
-					<span class="flex-auto">
-						<dt class="font-bold">{domainItem.domain}</dt>
-					</span>
-				</button>
-				<br />
-			{/each}
-		{/if}
+	{#if content.type === 'file'}
+		<textarea
+			class="textarea"
+			rows="20"
+			on:input={(e) => {
+				content.content = e.target.value;
+			}}>{content.content}</textarea
+		>
+		<br />
+		<button
+			class="btn variant-filled-success"
+			on:click={() => {
+				if (saving) return;
+				saving = true;
+				socket.emit('saveFile', { file: data.file, content: content.content });
+			}}
+		>
+			{#if saving}
+				Saving...
+			{:else}
+				Save
+			{/if}
+		</button>
+	{/if}
+	{#if content.type === 'directory'}
 		{#each items as item}
 			{#if item.path == ''}
 				<div
@@ -107,19 +125,5 @@
 				</div>
 			{/if}
 		{/each}
-	</dl>
+	{/if}
 </div>
-
-{#if popup.enabled}
-	<div
-		class="card p-4 w-72 shadow-xl fixed"
-		style="left: {popup.left}px; top: {popup.top}px;"
-		in:fade={{ duration: 200 }}
-		out:fade={{ duration: 200 }}
-		id="popup"
-	>
-		<div><p>✎Edit</p></div>
-		<div><p>🗑Delete</p></div>
-		<div class="arrow bg-surface-100-800-token" />
-	</div>
-{/if}
