@@ -27,8 +27,7 @@
 			goto('/'); //redirect to login page
 		});
 		socket.on('file', (data) => {
-			const decoder = new TextDecoder();
-			content = decoder.decode(data);
+			content = data;
 		});
 		socket.on('refresh', () => {
 			goto('/'); //redirect to login page
