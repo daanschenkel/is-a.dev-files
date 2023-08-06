@@ -16,8 +16,7 @@
 			<svelte:fragment slot="lead">is-a.dev</svelte:fragment>
 
 			<svelte:fragment slot="trail">
-			<a href="/new" class="btn variant-filled-error"> New file </a>
-				<a href="/logout" class="btn variant-filled-error"> Logout </a></svelte:fragment
+			<a href="/logout" class="btn variant-filled-error"> Logout </a></svelte:fragment
 			>
 		</AppBar>
 	</svelte:fragment>
