@@ -9,6 +9,7 @@
 	console.log(data);
 	let saving = false;
 	let content = '';
+	let config = {};
 	let items = [];
 	let popup = {
 		enabled: false
@@ -28,6 +29,7 @@
 		});
 		socket.on('file', (data) => {
 			content = data;
+			config = JSON.parse(content.content)
 		});
 		socket.on('refresh', () => {
 			goto('/'); //redirect to login page
@@ -48,7 +50,7 @@
 		});
 	});
 
-	console.log(content);
+	console.log(content.content);
 </script>
 
 <div class="container h-full mx-auto flex flex-col">
@@ -62,6 +64,42 @@
 	</div>
 	<br />
 	{#if content.type === 'file'}
+		{#if data.file == 'config.json'}
+			<div class="alert variant-filled-warning">
+				This is your config file. Please be careful when editing it.
+			</div>
+			<form>
+				{#each Object.keys(config) as key}
+					<div class="form-control">
+						<label class="label">{key}</label>
+						<input
+							class="input"
+							type="text"
+							value={config[key]}
+							on:input={(e) => {
+								config[key] = e.target.value;
+							}}
+						/>
+					</div>
+				{/each}
+				<button
+					class="btn variant-filled-success"
+					on:click={() => {
+						if (saving) return;
+						saving = true;
+						socket.emit('saveFile', { file: data.file, content: JSON.stringify(config) });
+					}}
+				>
+					{#if saving}
+						Saving...
+					{:else}
+						Save
+					{/if}
+				</button>
+				
+			</form>
+		{/if}
+		{#if data.file !== 'config.json'}
 		<textarea
 			class="textarea"
 			rows="20"
@@ -84,6 +122,7 @@
 				Save
 			{/if}
 		</button>
+		{/if}
 	{/if}
 	{#if content.type === 'directory'}
 		{#each items as item}
