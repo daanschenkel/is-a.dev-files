@@ -20,9 +20,6 @@
 			>
 		</AppBar>
 	</svelte:fragment>
-	<svelte:fragment slot="sidebarLeft"
-		><svelte:fragment
-	>
 	<!-- (sidebarRight) -->
 	<!-- (pageHeader) -->
 	<!-- Router Slot -->
