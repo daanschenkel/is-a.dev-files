@@ -21,11 +21,7 @@
 		</AppBar>
 	</svelte:fragment>
 	<svelte:fragment slot="sidebarLeft"
-		><ListBox>
-			<ListBoxItem bind:group={page} name="medium" value="books">Books</ListBoxItem>
-			<ListBoxItem bind:group={page} name="medium" value="movies">Movies</ListBoxItem>
-			<ListBoxItem bind:group={page} name="medium" value="tv">TV</ListBoxItem>
-		</ListBox></svelte:fragment
+		><svelte:fragment
 	>
 	<!-- (sidebarRight) -->
 	<!-- (pageHeader) -->
